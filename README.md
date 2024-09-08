@@ -15,7 +15,7 @@ The Library Website is a comprehensive platform designed for managing and intera
 ### Technologies Used
 
 - **Frontend**: React.js, TypeScript, Bootstrap
-- **Backend**: Java Spring Boot, Spring Data JPA
+- **Backend**: Java Spring Boot, Spring Data JPA，Spring Data REST
 - **Database**: MySQL
 - **Authentication**: JWT, OAuth2, OpenID Connect
 
