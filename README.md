@@ -19,3 +19,4 @@ The Library Website is a comprehensive platform designed for managing and intera
 - **Database**: MySQL
 - **Authentication**: JWT, OAuth2, OpenID Connect
 
+![walkthrough](https://github.com/user-attachments/assets/7d3b13d6-37da-4570-8909-7a74c9238cd2)
