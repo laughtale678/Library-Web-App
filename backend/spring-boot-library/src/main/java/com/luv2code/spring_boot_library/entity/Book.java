@@ -1,5 +1,4 @@
 package com.luv2code.spring_boot_library.entity;
-import lombok.Cleanup;
 import lombok.Data;
 import javax.persistence.*;
 
