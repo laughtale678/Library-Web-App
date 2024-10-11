@@ -35,6 +35,10 @@ export const BookCheckoutPage = () => {
     //get cur book id from url
     const bookId = (window.location.pathname).split('/')[2];
 
+    //payment
+    const [displayError, setDisplayError] = useState(false);
+    const [outstandingFeeError, setOutstandingFeeError] = useState("");
+
     //get book, need update when book is checked out
     useEffect(() => {
         const fetchBook = async () => {
@@ -67,7 +71,7 @@ export const BookCheckoutPage = () => {
             setHttpError(error.message);
         })
     }, [isCheckedOut]);
-    
+
     //get reviews for cur book， isReviewLeft is updated when user submit review
     useEffect(() => {
         const fetchBookReviews = async () => {
@@ -146,13 +150,13 @@ export const BookCheckoutPage = () => {
                 const url = `${process.env.REACT_APP_API}/books/secure/currentloans/count`;
                 const requestOptions = {
                     method: 'GET',
-                    headers: { 
+                    headers: {
                         Authorization: `Bearer ${authState.accessToken?.accessToken}`,
                         'Content-Type': 'application/json'
-                     }
+                    }
                 };
                 const currentLoansCountResponse = await fetch(url, requestOptions);
-                if (!currentLoansCountResponse.ok)  {
+                if (!currentLoansCountResponse.ok) {
                     throw new Error('Something went wrong!');
                 }
                 const currentLoansCountResponseJson = await currentLoansCountResponse.json();
@@ -217,11 +221,18 @@ export const BookCheckoutPage = () => {
                 'Content-Type': 'application/json'
             }
         };
-        const checkoutResponse = await fetch(url, requestOptions);
-        if (!checkoutResponse.ok) {
-            throw new Error('Something went wrong!');
+        try {
+            const checkoutResponse = await fetch(url, requestOptions);
+            if (!checkoutResponse.ok) {
+                setDisplayError(true);
+                throw new Error('Something went wrong!');
+            }
+            setDisplayError(false);
+            setOutstandingFeeError("");
+            setIsCheckedOut(true);
+        } catch(error) {
+            setOutstandingFeeError("Please pay outstanding fees and/or return late books");
         }
-        setIsCheckedOut(true);
     }
 
     async function submitReview(starInput: number, reviewDescription: string) {
@@ -257,6 +268,12 @@ export const BookCheckoutPage = () => {
         <div>
             {/* desktop */}
             <div className='container d-none d-lg-block'>
+                {
+                    displayError &&
+                    <div className='alert alert-danger' role='alert'>
+                        {outstandingFeeError}
+                    </div>
+                }
                 <div className='row mt-5'>
                     <div className='col-sm-2 col-md-2'>
                         {book?.img ?
@@ -274,15 +291,21 @@ export const BookCheckoutPage = () => {
                             <StarsReview rating={totalStars} size={32} />
                         </div>
                     </div>
-                    <CheckoutAndReviewBox book={book} mobile={false} currentLoansCount={currentLoansCount} 
-                        isAuthenticated={authState?.isAuthenticated} isCheckedOut={isCheckedOut} 
-                        checkoutBook={checkoutBook} isReviewLeft={isReviewLeft} submitReview={submitReview}/>
+                    <CheckoutAndReviewBox book={book} mobile={false} currentLoansCount={currentLoansCount}
+                        isAuthenticated={authState?.isAuthenticated} isCheckedOut={isCheckedOut}
+                        checkoutBook={checkoutBook} isReviewLeft={isReviewLeft} submitReview={submitReview} />
                 </div>
                 <hr />
                 <LatestReviews reviews={reviews} bookId={book?.id} mobile={false} />
             </div>
             {/* mobile */}
             <div className='container d-lg-none mt-5'>
+                {
+                    displayError &&
+                    <div className='alert alert-danger' role='alert'>
+                        {outstandingFeeError}
+                    </div>
+                }
                 <div className='d-flex justify-content-center alighn-items-center'>
                     {book?.img ?
                         <img src={book?.img} width='226' height='349' alt='Book' />
@@ -299,9 +322,9 @@ export const BookCheckoutPage = () => {
                         <StarsReview rating={totalStars} size={32} />
                     </div>
                 </div>
-                <CheckoutAndReviewBox book={book} mobile={true} currentLoansCount={currentLoansCount} 
-                    isAuthenticated={authState?.isAuthenticated} isCheckedOut={isCheckedOut} 
-                    checkoutBook={checkoutBook} isReviewLeft={isReviewLeft} submitReview={submitReview}/>
+                <CheckoutAndReviewBox book={book} mobile={true} currentLoansCount={currentLoansCount}
+                    isAuthenticated={authState?.isAuthenticated} isCheckedOut={isCheckedOut}
+                    checkoutBook={checkoutBook} isReviewLeft={isReviewLeft} submitReview={submitReview} />
                 <hr />
                 <LatestReviews reviews={reviews} bookId={book?.id} mobile={true} />
             </div>
